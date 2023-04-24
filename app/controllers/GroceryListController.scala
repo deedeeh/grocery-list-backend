@@ -10,13 +10,29 @@ import scala.collection.mutable.ListBuffer
 class GroceryListController @Inject()(val controllerComponents: ControllerComponents) extends BaseController {
 
   private val groceryList = new ListBuffer[GroceryListItem]()
-  groceryList += GroceryListItem("Chocolate", 2)
-  groceryList += GroceryListItem("Cheese", 2.5)
-  def getAll() = Action {
+
+  def getItems() = Action {
     if (groceryList.isEmpty) {
       NoContent
     } else {
       Ok(Json.toJson(groceryList))
     }
   }
+
+  def createItem() = Action { implicit request =>
+    val response = request.body
+    val jsonObject = response.asJson
+    val groceryListItem: Option[GroceryListItem] =
+      jsonObject.flatMap(Json.fromJson[GroceryListItem](_).asOpt)
+
+    groceryListItem match {
+      case Some(newItem) =>
+        val item = GroceryListItem(newItem.item, newItem.price)
+        groceryList += item
+        println(item)
+        Created(Json.toJson(item))
+      case None => BadRequest
+    }
+  }
+
 }
