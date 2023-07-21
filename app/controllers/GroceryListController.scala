@@ -13,6 +13,7 @@ class GroceryListController @Inject()(val controllerComponents: ControllerCompon
 
   def getItems() = Action {
     if (groceryList.isEmpty) {
+      println("Sorry no items yet!")
       NoContent
     } else {
       Ok(Json.toJson(groceryList))
@@ -30,7 +31,7 @@ class GroceryListController @Inject()(val controllerComponents: ControllerCompon
         val item = GroceryListItem(newItem.item, newItem.price)
         groceryList += item
         println(item)
-        Created(Json.toJson(item))
+        Ok(Json.toJson(item))
       case None => BadRequest
     }
   }
